@@ -1,0 +1,28 @@
+{
+    "name": "wenshizhengxin/news",
+    "description": "epii-admin框架 新闻管理插件",
+    "authors": [
+        {
+            "name": "Temple Chan",
+            "email": "1421224516@qq.com"
+        }
+    ],
+    "license": "MIT",
+    "require": {
+        "php": ">=7.0",
+        "epii/admin-center": ">=0.0.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "wenshizhengxin\\news\\": "src/"
+        }
+    },
+    "extra": {
+        "epii_admin_addons": {
+            "app": "wenshizhengxin\\news\\App",
+            "title": "文始新闻管理插件",
+            "version": "0.0.1",
+            "base_name_space": "wenshizhengxin\\news\\app"
+        }
+    }
+}
