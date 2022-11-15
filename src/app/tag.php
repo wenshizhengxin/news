@@ -4,12 +4,15 @@ namespace wenshizhengxin\news\app;
 
 use epii\server\Args;
 use think\Db;
+use wenshizhengxin\news\libs\Constant;
 
 class tag extends base
 {
     public function index()
     {
         try {
+            $this->assign('mode', Args::params('mode/d'));
+
             $this->adminUiDisplay();
         } catch (\Exception $e) {
             $this->error($e->getMessage());
@@ -22,13 +25,17 @@ class tag extends base
             $alias = 't';
             $where = [];
 
+            if (Args::params('mode/d')) {
+                $where[] = [$alias . '.status', '=', Constant::STATUS_ACTIVE];
+            }
+
             if ($tag_name = Args::params('tag_name/s')) {
                 $where[] = [
                     $alias . '.' . 'tag_name', 'like', '%' . $tag_name . '%'
                 ];
             }
 
-            $query = Db::name('tag')->alias($alias);
+            $query = Db::name(Constant::TABLE_TAG)->alias($alias)->order($alias . '.id', 'DESC');
             return $this->tableJsonData($query, $where, function ($row) {
                 $row['create_time'] = date('Y-m-d H:i:s', $row['create_time']);
                 return $row;
@@ -46,7 +53,7 @@ class tag extends base
 
                     'tag_name' => Args::params('tag_name/s/1'),
                     'status' => Args::params('status/d'),
-                    'sort' => Args::params('sort/d'),
+                    'sort' => Args::params('sort/d', 1000),
                 ];
 
                 $timestamp = time();
@@ -55,13 +62,13 @@ class tag extends base
                 Db::startTrans();
                 if ($id === 0) { // 新增
                     $insertData['create_time'] = $timestamp;
-                    $res = Db::name('tag')->insert($insertData, false, true);
+                    $res = Db::name(Constant::TABLE_TAG)->insert($insertData, false, true);
                     if (!$res) {
                         throw new \Exception('添加失败');
                     }
                 } else { // 修改
                     $insertData['update_time'] = $timestamp;
-                    $res = Db::name('tag')->where('id', $id)->update($insertData);
+                    $res = Db::name(Constant::TABLE_TAG)->where('id', $id)->update($insertData);
                     if (!$res) {
                         throw new \Exception('修改失败');
                     }
@@ -72,9 +79,11 @@ class tag extends base
                 $this->success();
             } else {
                 if ($id > 0) {
-                    $tag = Db::name('tag')->where('id', $id)->find();
+                    $tag = Db::name(Constant::TABLE_TAG)->where('id', $id)->find();
                     $this->assign('tag', $tag);
                 }
+
+                $this->assign('statusOptions', \wenshizhengxin\news\libs\Article::getStatusOptions());
 
                 $this->adminUiDisplay();
             }
@@ -88,7 +97,7 @@ class tag extends base
     {
         try {
             $id = Args::params('id/1');
-            $res = Db::name('tag')->where('id', $id)->delete();
+            $res = Db::name(Constant::TABLE_TAG)->where('id', $id)->delete();
             if (!$res) {
                 throw new \Exception('删除失败');
             }

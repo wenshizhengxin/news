@@ -10,9 +10,9 @@
     </div>
     <div class="form-group" id="group-sort">
         <label>排序：</label>
-        <input type="text" class="form-control" name="sort" id="sort" placeholder="请输入排序" value="{$classify['sort'] ? ''}">
+        <input type="text" class="form-control" name="sort" id="sort" placeholder="请输入排序" value="{$classify['sort'] ? '1000'}">
     </div>
-    <div class="form-group" id="group-pid">
+    <!-- <div class="form-group" id="group-pid">
         <label>父分类：</label>
         <input type="text" class="form-control" name="pid" id="pid" placeholder="请输入父分类" value="{$classify['pid'] ? ''}">
     </div>
@@ -31,10 +31,10 @@
     <div class="form-group" id="group-badge_class">
         <label>徽章实现类：</label>
         <input type="text" class="form-control" name="badge_class" id="badge_class" placeholder="请输入徽章实现类" value="{$classify['badge_class'] ? ''}">
-    </div>
+    </div> -->
     <div class="form-group" id="group-status">
         <label>状态：</label>
-        <select class="selectpicker" name="status" id="status">{:options,,}</select>
+        <select class="selectpicker" name="status" id="status">{:options,$statusOptions,$classify['status']?'1'}</select>
     </div>
     <div class="form-footer">
         <input type="hidden" name="id" value="{$classify['id'] ? 0}">

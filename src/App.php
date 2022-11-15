@@ -22,7 +22,7 @@ class App extends AddonsApp
             return false;
         }
         // 初始化配置
-        $initSettings = require __DIR__ . '/../data/setting/setting.php';
+        $initSettings = require __DIR__ . '/../data/settings/settings.php';
         foreach ($initSettings as $setting) {
             Settings::set(Constant::ADDONS . '.' . $setting['name'], $setting['value'], 0, 2, $setting['note']);
         }
@@ -32,15 +32,15 @@ class App extends AddonsApp
         if (!$pid) {
             return false;
         }
-        $id = $this->addMenu($pid, '新闻文章', '?app=article@index&__addons=' . Constant::ADDONS);
+        $id = $this->addMenu($pid, '新闻文章', '?app=article@index');
         if (!$id) {
             return false;
         }
-        $id = $this->addMenu($pid, '新闻分类', '?app=classify@index&__addons=' . Constant::ADDONS);
+        $id = $this->addMenu($pid, '新闻分类', '?app=classify@index');
         if (!$id) {
             return false;
         }
-        $id = $this->addMenu($pid, '新闻标签', '?app=tag@index&__addons=' . Constant::ADDONS);
+        $id = $this->addMenu($pid, '新闻标签', '?app=tag@index');
         if (!$id) {
             return false;
         }

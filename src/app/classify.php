@@ -4,12 +4,15 @@ namespace wenshizhengxin\news\app;
 
 use epii\server\Args;
 use think\Db;
+use wenshizhengxin\news\libs\Constant;
 
 class classify extends base
 {
     public function index()
     {
         try {
+            $this->assign('mode', Args::params('mode/d'));
+
             $this->adminUiDisplay();
         } catch (\Exception $e) {
             $this->error($e->getMessage());
@@ -22,18 +25,22 @@ class classify extends base
             $alias = 'c';
             $where = [];
 
+            if (Args::params('mode/d')) {
+                $where[] = [$alias . '.status', '=', Constant::STATUS_ACTIVE];
+            }
+
             if ($classify_name = Args::params('classify_name/s')) {
                 $where[] = [
-                    $alias . '.' . 'classify_name', 'like', '%' . $classify_name . '%'
+                    $alias . '.classify_name', 'like', '%' . $classify_name . '%'
                 ];
             }
             if ($pid = Args::params('pid/d')) {
                 $where[] = [
-                    $alias . '.' . 'pid', '=',  $pid
+                    $alias . '.pid', '=',  $pid
                 ];
             }
 
-            $query = Db::name('classify')->alias($alias);
+            $query = Db::name(Constant::TABLE_CLASSIFY)->alias($alias)->order($alias . '.id', 'DESC');
             return $this->tableJsonData($query, $where, function ($row) {
                 $row['create_time'] = date('Y-m-d H:i:s', $row['create_time']);
                 return $row;
@@ -51,12 +58,12 @@ class classify extends base
 
                     'classify_name' => Args::params('classify_name/s/1'),
                     'note' => Args::params('note/s'),
-                    'sort' => Args::params('sort/d'),
-                    'pid' => Args::params('pid/d'),
-                    'icon' => Args::params('icon/s'),
-                    'icon2' => Args::params('icon2/2'),
-                    'badge' => Args::params('badge/s'),
-                    'badge_class' => Args::params('badge_class/s'),
+                    'sort' => Args::params('sort/d', 1000),
+                    // 'pid' => Args::params('pid/d'),
+                    // 'icon' => Args::params('icon/s'),
+                    // 'icon2' => Args::params('icon2/s'),
+                    // 'badge' => Args::params('badge/s'),
+                    // 'badge_class' => Args::params('badge_class/s'),
                     'status' => Args::params('status/d'),
                 ];
 
@@ -66,13 +73,13 @@ class classify extends base
                 Db::startTrans();
                 if ($id === 0) { // 新增
                     $insertData['create_time'] = $timestamp;
-                    $res = Db::name('classify')->insert($insertData, false, true);
+                    $res = Db::name(Constant::TABLE_CLASSIFY)->insert($insertData, false, true);
                     if (!$res) {
                         throw new \Exception('添加失败');
                     }
                 } else { // 修改
                     $insertData['update_time'] = $timestamp;
-                    $res = Db::name('classify')->where('id', $id)->update($insertData);
+                    $res = Db::name(Constant::TABLE_CLASSIFY)->where('id', $id)->update($insertData);
                     if (!$res) {
                         throw new \Exception('修改失败');
                     }
@@ -83,9 +90,11 @@ class classify extends base
                 $this->success();
             } else {
                 if ($id > 0) {
-                    $classify = Db::name('classify')->where('id', $id)->find();
+                    $classify = Db::name(Constant::TABLE_CLASSIFY)->where('id', $id)->find();
                     $this->assign('classify', $classify);
                 }
+
+                $this->assign('statusOptions', \wenshizhengxin\news\libs\Article::getStatusOptions());
 
                 $this->adminUiDisplay();
             }
@@ -99,7 +108,7 @@ class classify extends base
     {
         try {
             $id = Args::params('id/1');
-            $res = Db::name('classify')->where('id', $id)->delete();
+            $res = Db::name(Constant::TABLE_CLASSIFY)->where('id', $id)->delete();
             if (!$res) {
                 throw new \Exception('删除失败');
             }
